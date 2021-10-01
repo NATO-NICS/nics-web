@@ -1,0 +1,128 @@
+/*
+ * Copyright (c) 2008-2021, Massachusetts Institute of Technology (MIT)
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ * list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+define(['ol',
+        'iweb/CoreModule',
+ 		'nics/modules/UserProfileModule',
+ 		'nics/modules/report/common/ReportTableController'], 
+
+	function(ol, Core, UserProfile){
+	
+		return Ext.define('modules.report-eod.EODReportController', {
+			extend : 'modules.report.ReportTableController',
+			
+			alias: 'controller.eodreportcontroller',
+			
+			imageProperty: 'image',
+			
+			imagePath: 'fullPath',
+			
+			reportView: {
+				"tasktype": "Task Type",
+				"town": "Town",
+				"macID": "MAC Id",
+				"contactPerson": "Contact Person",
+				"team": "Team",
+				"expendedResources": "Expended Resources",
+				"canton": "Canton",
+				"medevacPointTimeDistance": "Medevac Point Time Distance",
+				"directlyInvolved": "Directly Involved",
+				"contactAddress": "Contact Address",
+				"contactPhone": "contactPhone",
+				"user": "User",
+				"remarks": "Remarks",
+				"uxo": [{"cal":"Cal",
+						 "model":"Model",
+						 "propertyType":"Property Type",
+						 "quantity":"Quantity",
+						 "uxoType":"UXO Type"}]
+			},
+			
+			onSelectionChange: function(grid, selected, eOpts){
+				var formId = null;
+				if (selected && selected.length) {
+					formId = selected[0].get("formId");
+				}
+
+				var store = this.lookupReference(this.view.imageRef).store;
+				store.filter('formId', formId);
+			},
+			
+			onRowDblClick: function(grid, record, tr, rowIndex, e, eOpts){
+				if(record.data.message){
+					this.showReport(JSON.parse(record.data.message));
+				}
+			},
+			
+			getFormData: function(report){
+				var message = JSON.parse(report.message);
+				
+				if(message["lon"] &&
+						message["lat"]){
+					var feature = this.addFeature(message["lon"],
+							message["lat"], report.formId);
+
+					var fields = [];
+
+					for (var prop in this.reportView) {
+						// Only show the data with values
+						if (this.reportView[prop]) {
+							if(typeof this.reportView[prop] === 'object'){
+								fields.push({
+									xtype: 'displayfield',
+									fieldLabel: this.reportView[prop].label,
+									value: Ext.String.format(this.reportView[prop].html, message[prop])
+								});
+							}else{
+								fields.push({
+									xtype: 'displayfield',
+									fieldLabel: this.reportView[prop],
+									value: message[prop]
+								});
+							}
+						}
+					}
+					feature.set('fields', fields);
+				}
+				return {
+					formId: report.formId,
+					user: message["user"],
+				    submitted: Core.Util.formatDateToString(new Date(report.seqtime)),
+					contactperson: message.contactperson,
+					tasktype: message.tasktype,
+					town: message.town,
+					canton: message.canton,
+			        message: report.message,
+					team: message.team,
+					uxo: message.uxo,
+					collabroomid: report.collabroomid
+				};
+			}
+		});
+});

@@ -1,0 +1,29 @@
+{
+  "name": "nics-web",
+  "private": true,
+  "browser": "./src/main/webapp/js/main.js",
+  "scripts": {
+    "build": "webpack"
+  },
+  "dependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@esri/arcgis-rest-auth": "^3.3.0",
+    "babel-loader": "^8.2.2",
+    "d3": "^7.0.1",
+    "exports-loader": "^3.0.0",
+    "expose-loader": "^3.0.0",
+    "georsstogeojson": "^0.1.0",
+    "git-revision-webpack-plugin": "^5.0.0",
+    "glob": "^7.1.7",
+    "html-webpack-plugin": "^5.3.2",
+    "imports-loader": "^3.0.0",
+    "iweb-modules": "github:NATO-NICS/iweb-modules",
+    "jquery": "^3.6.0",
+    "ole": "github:planetfederal/ole#v0.6.3",
+    "proj4": "^2.7.5",
+    "survey-knockout": "^1.7.26",
+    "webpack": "^5.51.1",
+    "webpack-cli": "^4.8.0"
+  }
+}
