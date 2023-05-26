@@ -45,7 +45,7 @@ define([
                 html: "<div style=\"cursor: pointer;font-family: Arial,Verdana,sans-serif;font-size: 11px;font-weight: bold;color:blue\"><u>" + label + "</u></div>",
                 listeners: {
                     click: function(){
-						window.open('https://public.nics.ll.mit.edu/nicshelp', '_blank');
+						window.open(Core.Config.getProperty('help.site.url'), '_blank');
                     },
                     element: 'el'
                 }
